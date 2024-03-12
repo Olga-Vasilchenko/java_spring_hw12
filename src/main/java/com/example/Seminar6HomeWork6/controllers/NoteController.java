@@ -2,7 +2,10 @@ package com.example.Seminar6HomeWork6.controllers;
 
 import com.example.Seminar6HomeWork6.models.Note;
 import com.example.Seminar6HomeWork6.services.NoteService;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Metrics;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +21,8 @@ import java.util.List;
 @RequestMapping("/notes")
 public class NoteController {
 
+    private final Counter addNoteCounter = Metrics.counter("add_note_count");
+
     private final NoteService noteService;
 
     /**
@@ -25,7 +30,7 @@ public class NoteController {
      * @return - список всех заметок
      */
     @GetMapping()
-    public ResponseEntity<List<Note>> getAll() {
+    public ResponseEntity<List<Note>> getAllNotes() {
         return new ResponseEntity<>(noteService.getAllNotes(), HttpStatus.OK);
     }
 
@@ -36,6 +41,7 @@ public class NoteController {
      */
     @PostMapping()
     public ResponseEntity<Note> createNote(@RequestBody Note note) {
+        addNoteCounter.increment();
         note.setCreateDate(LocalDateTime.now());
         return new ResponseEntity<>(noteService.createNote(note), HttpStatus.CREATED);
     }
@@ -64,7 +70,7 @@ public class NoteController {
     @PutMapping("/{id}")
     public ResponseEntity<Note> updateNote(@RequestBody Note note, @PathVariable("id") Long id) {
         note.setId(id);
-        return new ResponseEntity<>(noteService.updateNote(note), HttpStatus.OK);
+        return new ResponseEntity<>(noteService.updateNote(id, note), HttpStatus.OK);
     }
 
     /**

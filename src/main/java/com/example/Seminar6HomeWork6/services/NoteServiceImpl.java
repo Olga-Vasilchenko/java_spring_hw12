@@ -1,16 +1,16 @@
 package com.example.Seminar6HomeWork6.services;
 
-import com.example.Seminar6HomeWork6.aspects.TrackUserAction;
 import com.example.Seminar6HomeWork6.models.Note;
 import com.example.Seminar6HomeWork6.repositories.NoteRepository;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class NoteServiceImpl implements NoteService{
 
     private final NoteRepository noteRepository;
@@ -20,7 +20,6 @@ public class NoteServiceImpl implements NoteService{
      * @return - возвращает список заметок
      */
     @Override
-    @TrackUserAction
     public List<Note> getAllNotes() {
         return noteRepository.findAll();
     }
@@ -31,7 +30,6 @@ public class NoteServiceImpl implements NoteService{
      * @return - возвращает заметку
      */
     @Override
-    @TrackUserAction
     public Note getNoteById(Long id) {
         return noteRepository.findById(id).orElseThrow(null);
     }
@@ -42,9 +40,8 @@ public class NoteServiceImpl implements NoteService{
      * @return - обновленная заметка
      */
     @Override
-    @TrackUserAction
-    public Note updateNote(Note note) {
-        Note noteById = getNoteById(note.getId());
+    public Note updateNote(Long id, Note note) {
+        Note noteById = getNoteById(id);
         noteById.setHeading(note.getHeading());
         noteById.setContent(note.getContent());
         return noteRepository.save(noteById);
@@ -56,9 +53,8 @@ public class NoteServiceImpl implements NoteService{
      * @return - возвращает новую сохраненную заметку
      */
     @Override
-    @TrackUserAction
     public Note createNote(Note note) {
-//        note.setDateTime(LocalDateTime.now());
+        note.setCreateDate(LocalDateTime.now());
         return noteRepository.save(note);
     }
 
@@ -68,7 +64,7 @@ public class NoteServiceImpl implements NoteService{
      * @return
      */
     @Override
-    @TrackUserAction
+//    @TrackUserAction
     public void deleteNote(Long id) {
         Note noteById = getNoteById(id);
         noteRepository.delete(noteById);
