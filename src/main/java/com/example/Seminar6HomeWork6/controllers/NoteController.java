@@ -1,6 +1,7 @@
 package com.example.Seminar6HomeWork6.controllers;
 
 import com.example.Seminar6HomeWork6.models.Note;
+import com.example.Seminar6HomeWork6.services.FileGateWay;
 import com.example.Seminar6HomeWork6.services.NoteService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Metrics;
@@ -25,6 +26,8 @@ public class NoteController {
 
     private final NoteService noteService;
 
+    private final FileGateWay fileGateWay;
+
     /**
      * Метод обработки Get-запроса без параметров по адресу - localhost:8080/notes
      * @return - список всех заметок
@@ -41,6 +44,7 @@ public class NoteController {
      */
     @PostMapping()
     public ResponseEntity<Note> createNote(@RequestBody Note note) {
+        fileGateWay.writeToFile(note.getHeading() + ".txt", note.getContent()); // вход в интеграцию
         addNoteCounter.increment();
         note.setCreateDate(LocalDateTime.now());
         return new ResponseEntity<>(noteService.createNote(note), HttpStatus.CREATED);
